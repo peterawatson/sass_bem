@@ -1,0 +1,253 @@
+
+//Text color
+//1. Done and active steps
+//2. Disabled steps
+
+$step-text-color: #333; // 1
+$step-text-color-disabled: #999; //2
+
+
+ //Background color
+//1. Everything but active step
+//2. Active step
+
+$step-background-color:#EFEFEF; // 1
+$step-background-color-active: #FFF; // 2
+
+
+// Number background color
+//1. Disabled steps
+//2. Done and active steps
+
+$step-counter-color: #BCBCBC; //1
+$step-counter-color-active: #22A4BC; //2
+
+
+// Border that's being used pretty much everywhere
+
+$step-border: 1px solid #CCC;
+
+
+// Common spacing value
+
+$step-baseline: .5em; 
+
+
+// Breakpoint triggering mobile view
+
+$step-breakpoint: 767px;
+
+
+html{
+    box-sizing: border-box;
+}
+
+*,
+:before,
+:after{
+    box-sizing: inherit;
+}
+
+
+
+ // 1. Prevents user-selection from doing ugly things on screen
+ // without causing any accessibility issue since there is no point
+ // in selecting the step-wizard.
+ // 2. Hides default numbering.
+ // 3. Initializes a CSS counter called `steps` on the step-wizard.
+ // 4. Clears inner floats.
+ // 5. Resets initial padding.
+ // 6. Applies vertical rhythm.
+ 
+.steps {
+    user-select: none;                    // 1
+    list-style: none;                     // 2
+    counter-reset: steps;                 // 3
+    overflow: hidden;                     // 4
+    padding: 0;                           // 5
+    margin: 0 0 ($step-baseline * 2) 0;   // 6
+}
+
+
+
+// Step item
+// 1. Putting them all on the same line
+// 2. Context positioning for pseudo-elements
+// 3. Incrementing `steps` counter at each new item
+// 4. Top and border bottoms only
+// 5. Making sure content doesn't wrap
+
+.steps__item {
+  float: left;                            // 1
+  position: relative;                     // 2
+  counter-increment: steps;               // 3
+  border-top: $step-border;               // 4
+  border-bottom: $step-border;            // 4
+  white-space: nowrap;                    // 5
+  background: $step-background-color;
+
+  
+   // Changing the cursor on disabled items
+   // to something a bit more explicit.
+   
+  &[disabled] {
+    cursor: not-allowed;
+  }
+    
+     @for $i from 1 through 10 {  
+        &:first-child:nth-last-child(#{$i}),
+        &:first-child:nth-last-child(#{$i}) ~ & {
+            width: (100% / $i);
+        }
+    }
+    
+  
+  //Arrows
+  //1. Sizing 
+  //2. Putting it on the right edge
+  //3. Moving it back to the left from one half of it's size
+  //4. Slightly translating it from the top
+  //5. Rotating it 45 degrees, obviously
+  //6. Moving it on top of other things
+  //7. Applying borders on the two visible sides
+    &:after {
+    $sqrt-2: if(function-exists('sqrt') == true, sqrt(2), 1.4142135623730951);
+    $step-height: ($step-baseline * 3)  + ($step-baseline * 2) + (1/16 * 1em * 2);
+    $step-arrow-size: $step-height * $sqrt-2 / 2;
+    $top-offset: 1 / $sqrt-2 / 2 +em;
+
+    content: '';
+    width:  $step-arrow-size;               //1
+    height: $step-arrow-size;               //1
+    position: absolute;
+    left: 100%;                             //2
+    margin-left: -$step-arrow-size / 2;     //3
+    top: $top-offset;                       //4
+    transform: rotate(45deg);               //5
+    z-index: 2;                             //6
+    background: inherit;
+    border-right: $step-border;             //7
+    border-top: $step-border;               //7
+  }
+    
+     @media (max-width: $step-breakpoint) {
+    width: 100% !important;
+    border: $step-border;
+    border-bottom: none;
+    padding: ($step-baseline * 2) 0;
+
+
+     // Removing the arrows
+
+    &:after {
+      content: none;
+    }
+  }
+    
+
+
+}
+
+
+
+.steps__item:first-of-type {
+  border-left: $step-border;
+}
+
+.steps__item:last-of-type {
+  border-right: $step-border;
+
+  &:after {
+    content: none;
+  }
+}
+
+
+
+
+// Links
+// 1. Move to block to enlarge mouse area
+// 2. Center the label inside the item
+// 3. Remove the initial underline in case it's a `a`
+// 4. Add some extra space on top and bottom
+// 5. Visual sugar
+
+.steps__link {
+  display: block;                     // 1
+  text-align: center;                 // 2
+  text-decoration: none;              // 3
+  padding: $step-baseline 0;          // 4
+  transition: .25s ease-out;          // 5
+  color: $step-text-color-disabled;
+
+  
+     // Hover/focus styles
+     // Changing the text color is enough
+   
+      &:hover,
+      &:focus {
+        color: $step-text-color;
+      }
+
+  
+      // Prevent any hover state on disabled items
+   
+      [disabled] &:hover,
+      [disabled] &:focus {
+        color: $step-text-color-disabled;
+      }
+    
+    
+    
+      //Numbers
+      //1. Display the current `steps` counter value
+      //2. Make it inline-block so it can be styled as a block
+      //3. Size the it according to the baseline
+      //4. Horizontal centering
+      //5. Vertical centering
+      //6. Extra space around it
+      //7. Make it round
+      //8. Color stuff
+ 
+      &:before {
+        content: counter(steps);            // 1
+        display: inline-block;              // 2
+        width:  $step-baseline * 3;         // 3
+        height: $step-baseline * 3;         // 3
+        text-align: center;                 // 4
+        line-height: $step-baseline * 3;    // 5
+        margin: 0 $step-baseline * 2;       // 6
+        border-radius: 50%;                 // 7
+        background: $step-counter-color;    // 8
+        color: white;                       // 8
+      }
+    
+      @media (max-width: $step-breakpoint) {
+          float: left;
+          margin-right: 0;
+      }
+    
+}
+
+
+.steps__item--active {
+  background: $step-background-color-active;
+}
+
+.steps__item--done .steps__link,
+.steps__iten--active .steps__link {
+  color: $step-text-color;
+
+  &:before {
+    background: $step-counter-color-active;
+  }
+}
+
+
+.steps__item--last {
+  // Other styles... 
+
+  @media (max-width: $step-breakpoint) {
+    border-bottom: $step-border;
+  }
+}
